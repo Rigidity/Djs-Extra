@@ -2,7 +2,7 @@
 This provides a set of utilities for the Discord.js library. You can find a full list of the features below, with examples and documentation.  
 
 # Installation
-The only thing that is required for this to work is the `discord.js` library.  
+The only thing that is required for this to work is the `discord.js` library.
 `npm i -s discord.js`  
 `npm i -s djs-extra`  
 
@@ -17,9 +17,9 @@ ESM Import `import params from 'djs-extra/params';`
 Splits some text into a name, list of raw arguments, and the remaining text.  
 ```ts
 function lex(text: string): {
-    name: string,
-    items: string[],
-    text: string
+	name: string,
+	items: string[],
+	text: string
 }
 ```
 
@@ -27,13 +27,13 @@ function lex(text: string): {
 Executes the parameters with a given set of usages and calls the matching function. If an error occurred, info will be passed to the error handler.  
 ```ts
 function parse(
-    items: string[],
-    text: string,
-    client: Client,
-    guild: Guild,
-    usages: Record<string, Function>,
-    success: Function,
-    error: Function
+	items: string[],
+	text: string,
+	client: Client,
+	guild: Guild,
+	usages: Record<string, Function>,
+	success: Function,
+	error: Function
 )
 ```
 
@@ -85,55 +85,46 @@ client.once('ready', () => console.log('The parameter testing bot is now online!
 // Command Handler
 client.on('message', async message => {
 
-    // Validate
-    if (message.author.bot || message.guild === null) return;
+	// Validate
+	if (message.author.bot || message.guild === null) return;
 
-    // Check Prefix
-    let text = message.content;
-    if (!text.startsWith('!')) return;
-    text = text.slice(1).trimLeft();
+	// Check Prefix
+	let text = message.content;
+	if (!text.startsWith('!')) return;
+	text = text.slice(1).trimLeft();
 
-    // Apply Lexer
-    const result = lex(text);
-    if (result === undefined) return;
+	// Apply Lexer
+	const result = lex(text);
+	if (result === undefined) return;
 
-    // Check Command
-    if (result.name === 'help') {
+	// Check Command
+	if (result.name === 'help') {
 
-        // Apply Parser
-        const result = parse({
+		// Apply Parser
+		const output = await parse(result.items, result.text, client, message.guild, {
 
-            // Required Parameters
-            items: result.items,
-            text: result.text,
-            client, guild: message.guild,
+			// Usage
+			'[category]': async category => {
 
-            usages: {
+				// Execute Command
+				if (category.exists()) {
+					category = category.string();
+					await message.channel.send(`Category: ${category}`);
+				} else {
+					await message.channel.send('No category.');
+				}
 
-                // Usage
-                '[category]': async category => {
+				// Return Something
+				return 'Successfully executed command!';
 
-                    // Execute Command
-                    if (category.exists()) {
-                        category = category.string();
-                        await message.channel.send(`Category: ${category}`);
-                    } else {
-                        await message.channel.send('No category.');
-                    }
+			}
 
-                    // Return Something
-                    return 'Successfully executed command!';
+		});
 
-                }
+		// Log Result
+		console.log(output);
 
-            }
-
-        });
-
-        // Log Result
-        console.log(result);
-
-    }
+	}
 });
 
 // Discord Login

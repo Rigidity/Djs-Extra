@@ -1,6 +1,6 @@
 {
 	"name": "djs-extra",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "This provides a set of utilities for the Discord.js library.",
 	"main": "index.js",
 	"repository": {
